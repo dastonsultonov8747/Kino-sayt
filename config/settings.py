@@ -8,7 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 
 # SECRET_KEY va DEBUG ni .env dan olamiz
-SECRET_KEY = config('SECRET_KEY')
+SECRET_KEY = "django-insecure-j@5k_2v+d^cr4i%be1!$z*tr^7xwvb5+zno1ckw#)n*3*$z*mh"
 DEBUG = config('DEBUG', default=True, cast=bool)
 
 # Allowed Hosts
