@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% load static %}
+<head>
+    <!-- Font Awesome qo'shish -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+
+<style>
+
+    .serial-img-wrapper {
+        position: relative;
+        width: 100%;
+        height: 500px; /* Anime rasmlari uchun aniq balandlik belgilash (kattaroq) */
+        overflow: hidden;
+    }
+
+    .serial-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* Rasmni konteynerga to'g'ri moslash */
+    }
+
+    .serial-info {
+        position: absolute;
+        bottom: 30px;
+        left: 20px;
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        font-size: 28px; /* Kattaroq yozuv */
+        width: 90%; /* Info blokining kengligi */
+        box-sizing: border-box;
+    }
+
+    .serial-card {
+        margin-bottom: 50px;
+        padding-bottom: 30px;
+    }
+
+    .serial-items {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap; /* Itemlarni bitta qatorda joylashtirish */
+        margin-top: 20px;
+    }
+
+    .serial-item {
+        width: 30%; /* Har bir anime item uchun kenglik */
+        margin-bottom: 20px;
+        position: relative;
+    }
+
+    .serial-item-img-wrapper {
+        width: 100%;
+        height: 200px;
+        overflow: hidden;
+    }
+
+    .serial-item-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* Rasmni yuqori sifatda ko'rsatish */
+    }
+
+    .serial-item-info {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        color: white;
+        background-color: rgba(0, 0, 0, 0.2); /* Matn fonini ko'rinishli qilish */
+        padding: 10px;
+        border-radius: 5px;
+    }
+
+    .reyting i {
+        color: gold;
+    }
+
+    .container {
+        max-width: 1200px; /* Kenglikni cheklash */
+        margin: 0 auto;
+        padding-top: 50px; /* Containerning pastga tushishi */
+    }
+
+</style>
+
+<div class="container my-5">
+    {% for anime in animes %}
+    <div class="serial-card serial">
+        <!-- Anime ning katta rasmi va ma'lumotlari -->
+        <div class="serial-img-wrapper">
+            <img src="{{ anime.img.url }}" alt="{{ anime.name }}" class="serial-img">
+            <div class="serial-info">
+                <h3>{{ anime.name }}</h3>
+                <p>{{ anime.sigth_age }}+</p>
+                <p class="reyting">
+                    {% for i in ratings %}
+                    {% if i <= anime.reyting %}
+                    <i class="fa-solid fa-star"></i>
+                    {% else %}
+                    <i class="fa-regular fa-star"></i>
+                    {% endif %}
+                    {% endfor %}
+                </p>
+                <p>{{ anime.description }}</p>
+            </div>
+        </div>
+
+        <!-- Anime items (kichik rasmlar va ma'lumotlar) -->
+        <div class="serial-items">
+            {% for serial_itme in serial_items %}
+            {% if serial_itme.serial == anime %}
+            <div class="serial-item serial">
+                <div class="serial-item-img-wrapper">
+                    <img src="{{ serial_itme.img.url }}" alt="{{ serial_itme.name }}" class="serial-item-img">
+                </div>
+                <div class="serial-item-info">
+                    <p>{{ serial_itme.name }}</p>
+                    <p>{{ serial_itme.part }}-qism</p>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

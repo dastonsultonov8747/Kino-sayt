@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SXD Tube</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <!-- Bootstrap JS va Popper.js qo'shish -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
+            integrity="sha384-oBqDVmMz4fnFO9gybK7fq5k4kqjReQZ13CRmxhAqe9M7lO09q02JpksA0P/WeU5b"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"
+            integrity="sha384-pzjw8f+ua7Kw1TIq0aI1E1j5zHQ3z5Kz8KOn9Kw8FsmU8pHPrbH7jZTpefQx3c5O"
+            crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+          integrity="sha384-KyZXEJX3QJt3Hgx1ZpP3fFnbO43nHeQG2kFf5Xbdvhlf5l0dfP9I3c06ZK1Aow2x" crossorigin="anonymous">
+
+    <style>
+        /* Dropdown menu uchun umumiy stil */
+        .user-interface {
+            position: relative;
+        }
+
+        .dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 200px;
+            z-index: 100;
+        }
+
+        .dropdown.active {
+            display: block;
+        }
+
+        .user-details {
+            padding: 10px;
+        }
+
+        .user-details p {
+            margin: 5px 0;
+        }
+
+        .logout-btn {
+            width: 100%;
+            padding: 8px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .logout-btn:hover {
+            background-color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+<!-- Navbar -->
+<nav class="navbar">
+    <!-- Logo qismi -->
+    <div class="logo">
+        <img src="https://t4.ftcdn.net/jpg/04/67/15/09/360_F_467150902_zUs6Dvp9wJLGOoQRMOqGBtXaqXAJOFTO.jpg"
+             alt="SXD Logo">
+        <span>SXD Tube</span>
+    </div>
+
+    <!-- Home bo'limi -->
+    <div class="home">
+        <a href="{% url 'index' %}">Home</a>
+    </div>
+
+    <!-- Menu bo'limi -->
+    <div class="menu">
+        <ul>
+            <li><a href="{% url 'multfilimlar' %}">Multfilm</a></li>
+            <li><a href="#">Anime</a></li>
+            <li><a href="{% url 'kinolar' %}">Kinolar</a></li>
+            <li><a href="{% url 'seriallar' %}">Seriallar</a></li>
+        </ul>
+    </div>
+
+    <!-- Qidiruv oynasi -->
+    <div class="search-call">
+        <input type="text" placeholder="Qidirish...">
+        <button class="call-icon">🔎</button>
+    </div>
+
+    <!-- Foydalanuvchi menyusi -->
+    <div class="user-interface">
+        <img class="image"
+             src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSgqugyJge8XSwS5JVVpb1_BxA-w2Ue8H8Kiw&s"
+             alt="User Icon">
+        {% if user.is_authenticated %}
+        <button class="user-btn" onclick="toggleDropdown()">{{ user.username }}</button>
+        <div class="dropdown">
+            <div class="user-details">
+                <p><strong>Username:</strong> {{ user.username }}</p>
+                <p><strong>Email:</strong> {{ user.email }}</p>
+                <a href="">Profil</a>
+            </div>
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="logout-btn">Logout</button>
+            </form>
+        </div>
+        {% else %}
+        <a href="{% url 'login' %}" class="user-btn" onclick="hideVideoPlayer()">Ro'yxatdan o'tish</a>
+        <a href="{% url 'signup' %}" class="user-btn" onclick="hideVideoPlayer()">Kirish</a>
+        {% endif %}
+    </div>
+</nav>
+
+<!-- Video bo'limi -->
+<div class="container-video-katta">
+    <video id="intro-video" class="responsive-video" autoplay muted loop>
+        <source src="{{ select_movies.video_fayl.url }}" type="video/mp4">
+        Sizning brauzeringiz videoni qo‘llab-quvvatlamaydi.
+    </video>
+
+    <!-- Video haqida ma'lumot -->
+    <div class="video-info">
+        <div class="video-title">
+            <h3>{{ select_movies.name }}</h3>
+            <p class="reyting">
+                {% for i in ratings %}
+                {% if forloop.counter <= select_movies.reyting %}
+                <i class="fa-solid fa-star" style="color: red;"></i>
+                {% else %}
+                <i class="fa-regular fa-star" style="color: gray;"></i>
+                {% endif %}
+                {% endfor %}
+            </p>
+            <p class="sight-age">Ko'rish yoshi: {{ select_movies.sight_age }}+</p>
+        </div>
+        <br>
+        <!-- Play Now tugmasi -->
+        <div class="play-now-button-container">
+            <button id="play-now-btn" class="play-now-button" onclick="playNow()">Play Now</button>
+        </div><br>
+
+        <!-- Sound tugmasi -->
+        <div class="sound-button-container">
+            <button id="sound-btn" class="sound-button" onclick="toggleSound()">🔇</button>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- Video Modal -->
+<div id="video-modal" class="video-modal">
+    <button class="close-modal" onclick="closeModal()">&times;</button>
+    <video id="modal-video" controls>
+        <source src="{{ select_movies.video_fayl.url }}" type="video/mp4">
+        Sizning brauzeringiz videoni qo‘llab-quvvatlamaydi.
+    </video>
+
+    <div class="video-controls">
+        <button onclick="rewindVideo()">⏪ Orqaga</button>
+        <button onclick="togglePlayPause()">⏯️ Pause/Play</button>
+        <button onclick="forwardVideo()">⏩ Oldinga</button>
+    </div>
+</div>
+
+{% block content %}
+{% endblock %}
+
+<!-- JavaScript kodlari -->
+<script>
+    function toggleDropdown() {
+        var dropdown = document.querySelector('.dropdown');
+        dropdown.classList.toggle('active');
+    }
+
+    function openModal() {
+        const modal = document.getElementById('video-modal');
+        const video = document.getElementById('modal-video');
+        modal.style.display = 'flex';
+        video.play();
+    }
+
+    function closeModal() {
+        const modal = document.getElementById('video-modal');
+        const video = document.getElementById('modal-video');
+        video.pause();
+        modal.style.display = 'none';
+    }
+
+    function togglePlayPause() {
+        const video = document.getElementById('modal-video');
+        if (video.paused) {
+            video.play();
+        } else {
+            video.pause();
+        }
+    }
+
+    function rewindVideo() {
+        const video = document.getElementById('modal-video');
+        video.currentTime -= 10;
+    }
+
+    function forwardVideo() {
+        const video = document.getElementById('modal-video');
+        video.currentTime += 10;
+    }
+
+    function toggleSound() {
+        const video = document.getElementById('intro-video');
+        const soundBtn = document.getElementById('sound-btn');
+        video.muted = !video.muted;
+        soundBtn.textContent = video.muted ? '🔇' : '🔊';
+    }
+
+    function playNow() {
+        openModal();
+    }
+
+    // Video playerini yashirish
+    function hideVideoPlayer() {
+        const video = document.getElementById('intro-video');
+        const playNowBtn = document.getElementById('play-now-btn');
+        const soundBtn = document.getElementById('sound-btn');
+
+        video.style.display = 'none'; // Videoni yashirish
+        playNowBtn.style.display = 'none'; // "Play Now" tugmasini yashirish
+        soundBtn.style.display = 'none'; // "Sound" tugmasini yashirish
+    }
+
+    // Kirish va ro'yxatdan o'tish tugmasi bosilganida video, Play Now va Sound tugmalarini yashirish
+    document.querySelectorAll('.user-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            hideVideoPlayer();
+        });
+    });
+</script>
+
+<script src="{% static 'js/script.js' %}"></script>
+</body>
+</html>

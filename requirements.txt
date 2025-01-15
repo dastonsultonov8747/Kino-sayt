@@ -1,0 +1,17 @@
+asgiref
+certifi
+charset-normalizer
+crispy-bootstrap5
+Django
+django-crispy-forms
+djangorestframework
+idna
+pillow
+pip
+psycopg2
+requests
+sqlparse
+tzdata
+urllib3
+python-decouple
+gunicorn

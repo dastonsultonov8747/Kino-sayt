@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load crispy_forms_tags %}
+
+
+<div class="container">
+    <h2 class="text-center">Ro'yhatdan o'tish</h2>
+    <form method="post" class="registration-form">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button type="submit" class="btn btn-primary">Ro'yhatdan o'tish</button>
+    </form>
+    {% if form.errors %}
+        <div class="error">
+            <p>Ro'yhatdan o'tishda xatolar mavjud:</p>
+            <ul>
+                {% for error in form.errors.values %}
+                    <li>{{ error|join:", " }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}

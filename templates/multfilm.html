@@ -1,0 +1,243 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% load static %}
+
+<head>
+    <!-- Font Awesome qo'shish -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+
+<style>
+    /* Style kodlari */
+    .container-kino {
+        margin-top: 100px;
+    }
+
+    .container-kino h1 {
+        text-align: center;
+        margin-bottom: 50px;
+        color: white;
+        font-size: 2.5rem;
+        font-weight: bold;
+    }
+
+    .container-kino .row {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+
+    .container-kino .card {
+        width: 30%;
+        margin-bottom: 30px;
+        position: relative;
+        background-color: #fff;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
+
+    .container-kino .card:hover {
+        transform: translateY(-10px);
+    }
+
+    .container-kino .card img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+
+    .container-kino .card .overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 10px;
+        opacity: 1;
+        border-radius: 0 0 10px 10px;
+    }
+
+    .container-kino .card h5 {
+        font-size: 1rem;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .container-kino .card p {
+        font-size: 0.8rem;
+        margin-bottom: 5px;
+    }
+
+    .container-kino .card .reyting {
+        color: #f39c12;
+        font-weight: bold;
+    }
+
+    .container-kino .card i.fa-solid {
+        color: #f39c12; /* Yulduzchalar rangini qizil qilish */
+    }
+
+    .container-kino .card i.fa-star {
+        color: red; /* Yulduzchalar rangini qizil qilish */
+    }
+
+    /* Video Modal */
+    .video-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+        justify-content: center;
+        align-items: center;
+    }
+
+    .video-modal video {
+        max-width: 80%;
+        max-height: 80%;
+    }
+
+    .video-modal .close-modal {
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        font-size: 30px;
+        color: white;
+        background: none;
+        border: none;
+        cursor: pointer;
+    }
+
+    /* Media queries for responsive design */
+    @media (max-width: 1024px) {
+        .container-kino h1 {
+            font-size: 2rem;
+        }
+
+        .container-kino .card {
+            width: 48%;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .container-kino h1 {
+            font-size: 1.5rem;
+        }
+
+        .container-kino .card {
+            width: 100%;
+        }
+
+        .container-kino .card img {
+            height: 180px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .container-kino h1 {
+            font-size: 1.2rem;
+        }
+
+        .container-kino .card {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .container-kino .card img {
+            height: 160px;
+        }
+
+        .container-kino .card h5 {
+            font-size: 0.9rem;
+        }
+
+        .container-kino .card p {
+            font-size: 0.7rem;
+        }
+    }
+
+    @media (max-width: 320px) {
+        .container-kino h1 {
+            font-size: 1rem;
+        }
+
+        .container-kino .card img {
+            height: 140px;
+        }
+
+        .container-kino .card h5 {
+            font-size: 0.8rem;
+        }
+
+        .container-kino .card p {
+            font-size: 0.6rem;
+        }
+    }
+</style>
+
+<div class="container-kino">
+    <h1>Qiziqarli Multfilimlar</h1>
+    <div class="row">
+        {% for kino in multfilims %}
+        <div class="card"
+             onclick="openModal('{% if kino.video_fayl %}{{ kino.video_fayl.url }}{% else %}#{% endif %}')">
+            <img src="{{ kino.img.url }}" alt="{{ kino.name }}">
+            <div class="overlay">
+                <h5>{{ kino.name }}</h5>
+
+                <p class="reyting">
+                    {% for i in ratings %}
+                    {% if i <= kino.reyting %}
+                    <i class="fa-solid fa-star"></i> <!-- Fa-solid yulduzcha -->
+                    {% else %}
+                    <i class="fa-regular fa-star"></i> <!-- Fa-regular yulduzcha -->
+                    {% endif %}
+                    {% endfor %}
+                </p>
+
+                <p>Ko'rish yoshi: {{ kino.sight_age }}+</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Video Modal -->
+<div id="video-modal" class="video-modal">
+    <button class="close-modal" onclick="closeModal()">&times;</button>
+    <video id="modal-video" controls>
+        <source id="video-source" src="" type="video/mp4">
+        Sizning brauzeringiz videoni qo‘llab-quvvatlamaydi.
+    </video>
+</div>
+
+<script>
+    function openModal(videoUrl) {
+        const modal = document.getElementById('video-modal');
+        const video = document.getElementById('modal-video');
+        const videoSource = document.getElementById('video-source');
+        videoSource.src = videoUrl;
+        video.load();
+        video.play();
+        modal.style.display = 'flex';
+    }
+
+    function closeModal() {
+        const modal = document.getElementById('video-modal');
+        const video = document.getElementById('modal-video');
+        video.pause();
+        modal.style.display = 'none';
+    }
+</script>
+
+{% endblock %}

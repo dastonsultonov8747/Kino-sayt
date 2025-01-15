@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+<head>
+    <!-- Font Awesome qo'shish -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+
+<style>
+    /* Navbar va umumiy kontainerlar uchun */
+    .kontainer {
+        width: 100%;
+        padding: 10px;
+        box-sizing: border-box;
+        font-size: 1.5rem;
+        margin-top: 20px;
+        margin-bottom: 40px;
+    }
+
+    .menu_title {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .menu_heading {
+        color: white;
+        margin: 0;
+    }
+
+    .view_all {
+        color: white;
+        margin: 0;
+        cursor: pointer;
+    }
+
+    /* Karta va kino ma'lumotlari */
+    .container {
+        max-width: 100%;
+        margin: 0 auto;
+        overflow-x: auto; /* Gorizontal skroll */
+        white-space: nowrap; /* Bir qatorda qoladi */
+    }
+
+    .row.g-4 {
+        display: inline-flex; /* Kartalarni yonma-yon joylash */
+        gap: 20px; /* Kartalar orasidagi bo‘shliq */
+        padding-bottom: 15px;
+    }
+
+    .card {
+        display: inline-block;
+        position: relative;
+        width: 250px; /* Karta eni kattalashtirildi */
+        border: none;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        overflow: hidden; /* Chetdagi rasmni yashirish */
+        border-radius: 8px;
+    }
+
+    .card-img-top {
+        width: 100%;
+        height: 350px; /* Rasm balandligi kattalashtirildi */
+        object-fit: cover; /* Rasmlar bir xil proporsiyada chiqadi */
+    }
+
+    .card-info {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: rgba(0, 0, 0, 0.8); /* Yarim shaffof qora fon */
+        color: white;
+        padding: 10px;
+        text-align: center;
+    }
+
+    .card-title {
+        font-size: 18px;
+        font-weight: bold;
+        margin: 5px 0;
+    }
+
+    .card-genre,
+    .card-description {
+        font-size: 14px;
+        margin: 0;
+    }
+</style>
+
+<div class="kontainer">
+    <div class="menu_title">
+        <h3 class="menu_heading">Kinolar</h3>
+        <a href="{% url 'kinolar' %}" style="text-decoration: none;">
+            <h4 class="view_all">Hammasini ko'rish</h4>
+        </a>
+    </div>
+</div>
+
+<div class="container my-5">
+    <div class="row g-4">
+        {% for kinolar in kinolars %}
+        <div class="card">
+            <a href="{% url 'kinolar'%}" style="text-decoration: none;">
+                <img src="{{ kinolar.img.url }}" class="card-img-top" alt="Image">
+                <div class="card-info">
+                    <h5 class="card-title">{{ kinolar.name }}</h5>
+
+                    <p class="reyting">
+                        {% for i in ratings %}
+                        {% if forloop.counter <= kinolar.reyting %}
+                        <i class="fa-solid fa-star" style="color: red;"></i>
+                        {% else %}
+                        <i class="fa-regular fa-star" style="color: gray;"></i>
+                        {% endif %}
+                        {% endfor %}
+                    </p>
+                    <p class="card-description">Tavsifi: {{ kinolar.description }}</p>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="kontainer">
+    <div class="menu_title">
+        <h3 class="menu_heading">Multfilimlar</h3>
+        <a href="{% url 'multfilimlar' %}" style="text-decoration: none;">
+            <h4 class="view_all">Hammasini ko'rish</h4>
+        </a>
+    </div>
+</div>
+
+<div class="container my-5">
+    <div class="row g-4">
+        {% for kinolar in multfilms %}
+        <div class="card">
+            <a href="{% url 'multfilimlar'%}" style="text-decoration: none;">
+                <img src="{{ kinolar.img.url }}" class="card-img-top" alt="Image">
+                <div class="card-info">
+                    <h5 class="card-title">{{ kinolar.name }}</h5>
+                    <p class="reyting">
+                        {% for i in ratings %}
+                        {% if forloop.counter <= kinolar.reyting %}
+                        <i class="fa-solid fa-star" style="color: red;"></i>
+                        {% else %}
+                        <i class="fa-regular fa-star" style="color: gray;"></i>
+                        {% endif %}
+                        {% endfor %}
+                    </p>
+
+                    <p class="card-description">Tavsifi: {{ kinolar.description }}</p>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+
+<div class="kontainer">
+    <div class="menu_title">
+        <h3 class="menu_heading">Seriallar</h3>
+        <a href="{% url 'seriallar' %}" style="text-decoration: none;">
+            <h4 class="view_all">Hammasini ko'rish</h4>
+        </a>
+    </div>
+</div>
+
+<div class="container my-5">
+    <div class="row g-4">
+        {% for kinolar in serials %}
+        <div class="card">
+            <a href="{% url 'seriallar'%}">
+                <img src="{{ kinolar.img.url }}" class="card-img-top" alt="Image">
+                <div class="card-info">
+                    <h5 class="card-title">{{ kinolar.name }}</h5>
+
+                    <p class="reyting">
+                        {% for i in ratings %}
+                        {% if forloop.counter <= kinolar.reyting %}
+                        <i class="fa-solid fa-star" style="color: red;"></i>
+                        {% else %}
+                        <i class="fa-regular fa-star" style="color: gray;"></i>
+                        {% endif %}
+                        {% endfor %}
+                    </p>
+                    <p class="card-description">Tavsifi: {{ kinolar.description }}</p>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock content %}

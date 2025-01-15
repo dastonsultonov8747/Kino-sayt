@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% load static %}
+<head>
+    <!-- Font Awesome qo'shish -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+
+<style>
+    /* Serial rasm va info bo'lagi */
+    .serial-img-wrapper {
+        position: relative;
+        width: 100%;
+        height: 500px;
+        overflow: hidden;
+    }
+
+    .serial-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .serial-info {
+        position: absolute;
+        bottom: 30px;
+        left: 20px;
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        font-size: 28px;
+        width: 60%;
+        box-sizing: border-box;
+        background-color: rgba(0, 0, 0, 0.6);
+    }
+
+    .serial-card {
+        margin-bottom: 50px;
+        padding-bottom: 30px;
+    }
+
+    .serial-items {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        margin-top: 20px;
+    }
+
+    .serial-item {
+        width: 30%;
+        margin-bottom: 20px;
+        position: relative;
+    }
+
+    .serial-item-img-wrapper {
+        width: 100%;
+        height: 200px;
+        overflow: hidden;
+    }
+
+    .serial-item-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .serial-item-info {
+        position: absolute;
+        width: 50%;
+        bottom: 10px;
+        left: 10px;
+        color: white;
+        background-color: rgba(0, 0, 0, 0.6);
+        padding: 10px;
+        border-radius: 5px;
+    }
+
+    .reyting i {
+        color: gold;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding-top: 50px;
+    }
+
+    /* Responsiv dizayn */
+    @media (max-width: 768px) {
+        .serial-info {
+            width: 80%;
+            font-size: 22px;
+        }
+
+        .serial-item {
+            width: 48%;
+        }
+
+        .serial-item-info {
+            width: 80%;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .serial-info {
+            width: 100%;
+            font-size: 18px;
+        }
+
+        .serial-item {
+            width: 100%;
+        }
+
+        .serial-item-info {
+            width: 100%;
+        }
+    }
+
+    /* Video modal */
+    .video-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+        justify-content: center;
+        align-items: center;
+    }
+
+    .video-modal video {
+        max-width: 80%;
+        max-height: 80%;
+    }
+
+    .video-modal .close-modal {
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        font-size: 30px;
+        color: white;
+        background: none;
+        border: none;
+        cursor: pointer;
+    }
+</style>
+
+<div class="container my-5">
+    {% for serials in serials %}
+    <div class="serial-card serial">
+        <!-- Serialning katta rasmi va ma'lumotlari -->
+        <div class="serial-img-wrapper">
+            <img src="{{ serials.img.url }}" alt="{{ serials.name }}" class="serial-img">
+            <div class="serial-info">
+                <h1>{{ serials.name }}</h1>
+                <p>Ko'rish yoshi : {{ serials.sight_age }}+</p>
+                <p class="reyting">
+                    {% for i in ratings %}
+                    {% if forloop.counter <= select_movies.reyting %}
+                    <i class="fa-solid fa-star" style="color: red;"></i>
+                    {% else %}
+                    <i class="fa-regular fa-star" style="color: gray;"></i>
+                    {% endif %}
+                    {% endfor %}
+                </p>
+            </div>
+        </div>
+
+        <!-- Video ko'rish tugmasi -->
+        {% if serials.video_fayl %}
+        <button onclick="openModal('{{ serials.video_fayl.url }}')">Videoni Ko'rish</button>
+        {% endif %}
+
+        <!-- Serial items (kichik rasmlar va ma'lumotlar) -->
+        <div class="serial-items">
+            {% for serial_itme in serial_items %}
+            {% if serial_itme.serial == serials %}
+            <div class="serial-item serial">
+                <div class="serial-item-img-wrapper">
+                    <img src="{{ serial_itme.img.url }}" alt="{{ serial_itme.name }}" class="serial-item-img">
+                </div>
+                <div class="serial-item-info">
+                    <p>{{ serial_itme.name }}</p>
+                    <p>{{ serial_itme.part }}-qism</p>
+                    <p class="reyting">
+                        {% for i in ratings %}
+                        {% if forloop.counter <= select_movies.reyting %}
+                        <i class="fa-solid fa-star" style="color: red;"></i>
+                        {% else %}
+                        <i class="fa-regular fa-star" style="color: gray;"></i>
+                        {% endif %}
+                        {% endfor %}
+                    </p>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Video Modal -->
+<div id="video-modal" class="video-modal">
+    <button class="close-modal" onclick="closeModal()">&times;</button>
+    <video id="modal-video" controls>
+        <source id="video-source" src="" type="video/mp4">
+        Sizning brauzeringiz videoni qo‘llab-quvvatlamaydi.
+    </video>
+</div>
+
+<script>
+    function openModal(videoUrl) {
+        const modal = document.getElementById('video-modal');
+        const video = document.getElementById('modal-video');
+        const videoSource = document.getElementById('video-source');
+        videoSource.src = videoUrl;
+        video.load();
+        video.play();
+        modal.style.display = 'flex';
+    }
+
+    function closeModal() {
+        const modal = document.getElementById('video-modal');
+        const video = document.getElementById('modal-video');
+        video.pause();
+        modal.style.display = 'none';
+    }
+</script>
+
+{% endblock %}
